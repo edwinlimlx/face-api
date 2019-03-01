@@ -1,22 +1,23 @@
-// import 'babel-polyfill';
-// import 'isomorphic-fetch';
-
-// global.fetch = require('node-fetch');
 const path = require('path');
-// import fs from 'fs';
-// import moment from 'moment';
 const tf = require('@tensorflow/tfjs-node');
 const _ = require('lodash');
+const args = require('yargs').argv;
 const faceapi = require('face-api.js');
 const canvas = require('canvas');
 const fs = require('fs');
 const commons = require('./commons');
 
-const facesLabelledPath = './dist/faces_labelled';
 const { Canvas, Image, ImageData } = canvas;
 faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 
+const options = {
+  concurrent: args.concurrent ? args.concurrent : 8,
+  input: args.input ? args.input : './faces_labelled',
+  ouput: args.output ? args.output : './output',
+};
+
 const faceDetectionNet = faceapi.nets.ssdMobilenetv1;
+
 // SsdMobilenetv1Options
 const minConfidence = 0.5;
 
@@ -39,7 +40,7 @@ const getFaceDetectorOptions = net => (net === faceapi.nets.ssdMobilenetv1
 const faceDetectionOptions = getFaceDetectorOptions(faceDetectionNet);
 
 const saveFile = (fileName, buff) => {
-  const baseDir = './output';
+  const baseDir = options.ouput;
   if (!fs.existsSync(baseDir)) {
     fs.mkdirSync(baseDir);
   }
@@ -53,9 +54,9 @@ const init = async () => {
   await faceapi.nets.faceRecognitionNet.loadFromDisk('./src/models/');
 
   const imagesByPath = fs
-    .readdirSync(facesLabelledPath)
+    .readdirSync(options.input)
     .filter(p => !p.includes('DS_Store'))
-    .map(p => path.join(facesLabelledPath, p));
+    .map(p => path.join(options.input, p));
 
   const imagesArr = await Promise.all(
     commons.names.map(async (name) => {
