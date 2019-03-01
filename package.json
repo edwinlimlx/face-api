@@ -11,8 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "@tensorflow/tfjs-node": "^0.3.1",
+    "babel-polyfill": "^6.26.0",
     "canvas": "^2.3.1",
     "face-api.js": "^0.18.0",
+    "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "node-fetch": "^2.3.0",
@@ -26,6 +28,11 @@
     "babel-runtime": "^6.26.0",
     "eslint": "^5.14.1",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0"
+    "eslint-plugin-import": "^2.16.0",
+    "parcel-plugin-static-files-copy": "^2.0.0"
+  },
+  "staticFiles": {
+    "staticPath": "src",
+    "watcherGlob": "**"
   }
 }
