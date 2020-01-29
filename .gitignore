@@ -3,3 +3,4 @@ dist
 .cache
 faces_labelled
 images_raw
+output

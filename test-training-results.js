@@ -18,6 +18,14 @@ const init = async () => {
   await faceapi.nets.faceLandmark68Net.loadFromDisk('./src/models/');
   await faceapi.nets.faceRecognitionNet.loadFromDisk('./src/models/');
 
+  // commons.names = commons.names.slice(0, 3);
+
+  const labelledDescriptorRaw = fs.readFileSync('output/labelledDescriptors.json');
+  const labelledDescriptorJSON = JSON.parse(labelledDescriptorRaw);
+  // eslint-disable-next-line
+  const labelledDescriptors = _.map(labelledDescriptorJSON, o => new faceapi.LabeledFaceDescriptors(o._label, o._descriptors.map(d => new Float32Array(_.values(d)))));
+  const faceMatcher = new faceapi.FaceMatcher(labelledDescriptors);
+
   const imagesByPath = fs
     .readdirSync(options.input)
     .filter(p => !p.includes('DS_Store'))
@@ -66,13 +74,28 @@ const init = async () => {
     }
   });
 
-  console.log(`Building FaceMatcher from ${Object.keys(descriptorByNames).length} results`);
-  const labelledDescriptors = _.map(descriptorByNames, (descriptors, name) => new faceapi.LabeledFaceDescriptors(name, descriptors));
-  commons.saveFile('labelledDescriptors.json', JSON.stringify(labelledDescriptors));
+  const results = {};
+  _.map(descriptorByNames, (descriptors, name) => {
+    descriptors.forEach((d) => {
+      // console.log(name, faceMatcher.findBestMatch(d).toString());
+      if (
+        faceMatcher
+          .findBestMatch(d)
+          .toString()
+          .includes(name)
+      ) {
+        if (results[name]) {
+          results[name]++;
+        } else {
+          results[name] = 1;
+        }
+      }
+    });
+  });
 
-  // const faceMatcher = new faceapi.FaceMatcher(labelledDescriptors);
-  // console.log('faceMatcher0', faceMatcher.findBestMatch(descriptorByNames['Hanis Adibah Yusof'][0]).toString());
-  // console.log('faceMatcher2', faceMatcher.findBestMatch(descriptorByNames['Jose Mella'][0]).toString());
+  _.each(results, (v, name) => {
+    console.log(`${Math.floor((v / descriptorByNames[name].length) * 100)}%\t${name}`);
+  });
 };
 
 init();

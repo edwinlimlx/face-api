@@ -1,15 +1,17 @@
 const fs = require('fs');
+const path = require('path');
 const mkdirp = require('mkdirp');
+const args = require('yargs').argv;
 
-exports.mkdir = (path) => {
-  if (!fs.existsSync(path)) {
-    mkdirp(path, function (err) { 
+exports.mkdir = (p) => {
+  if (!fs.existsSync(p)) {
+    mkdirp(p, (err) => {
       if (err) {
         throw new Error(err);
       }
     });
   }
-}
+};
 
 exports.names = [
   'Hanis Adibah Yusof',
@@ -77,5 +79,14 @@ exports.names = [
   'Sneha Kohli',
   'Raymond Soh',
   'Jayashree Srinivasan',
-  'Srinivasan Jagannathan'
+  'Srinivasan Jagannathan',
 ];
+
+exports.saveFile = (fileName, buff) => {
+  const baseDir = args.output || './output';
+  if (!fs.existsSync(baseDir)) {
+    fs.mkdirSync(baseDir);
+  }
+
+  fs.writeFileSync(path.resolve(baseDir, fileName), buff);
+};

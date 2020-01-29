@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "train": "clear && eslint --fix train.js && node train.js"
+    "train": "clear && eslint --fix *.js && node train.js",
+    "predict": "clear && eslint --fix *.js && node test-training-results.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "face-api.js": "^0.18.0",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.11",
+    "mkdirp": "^0.5.1",
     "moment": "^2.24.0",
     "node-fetch": "^2.3.0",
     "yargs": "^13.2.1"
